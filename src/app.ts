@@ -1,12 +1,14 @@
 import  express from "express"
-import { TRANSACTIONS_DATA } from "./constants"
+import { getTransactionById,getTransactionChildren } from './helpers'
+
 const app = express();
 const port = 3000;
 
 app.get('/api/transactions', (req, res) => {
-    console.log("test",req.query);
-    
-  res.send('Hello World!');
+  const { connectionInfo,...transaction } = getTransactionById(req.query.transactionId as string)
+  const confidenceLevel = Number(req.query.confidenceLevel)  
+  const childTransactions = getTransactionChildren(transaction.children,confidenceLevel,transaction)
+  res.json({transactions:[transaction,...childTransactions]});
 });
 
 app.listen(port, () => {
